@@ -1,0 +1,27 @@
+*Sample retrieved surface temperature query from MCS v6:
+
+sql_29a = """
+select LS, scenelatitude, surfacetemperature, localtime
+from mcs_v6.mcs_header
+where obsdate between 20071209 and 20091026
+and scenelatitude between -90 and 90
+and localtime between 0 and 0.25
+and sza > 90
+
+"""
+df_29a = db.query(sql_29a)
+df_29a = df_29a.loc[df_29a["SURFACETEMPERATURE"] > 0]
+
+
+*Create binned dataset
+
+x_29 = df_29.LS
+y_29 = df_29.SCENELATITUDE
+values_29_surftemp = df_29.SURFACETEMPERATURE
+
+returns_29_surftemp = stats.binned_statistic_2d(x_29, y_29, values_29_surftemp, 'mean', bins=[binx, biny])
+
+
+*Save binned dataset
+
+np.save('MY29N_surf_temp_from_MCSv6', returns_29_surftemp.statistic.T)
